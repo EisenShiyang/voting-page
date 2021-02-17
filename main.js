@@ -16,6 +16,9 @@ var blue = 0;
 var yellow = 0;
 var last_vote;
 var vote_history = new Array();
+var red_history = new Array();
+var blue_history = new Array();
+var yellow_history = new Array();
 
 firebase.firestore().collection("colors").doc('red').onSnapshot((doc)=>{
     red = doc.data().count
@@ -83,18 +86,24 @@ function addData(chart, label, data) {
 document.getElementById('btn1').addEventListener('click', () => {
     firebase.firestore().collection('colors').doc('red').set({count: red + 1})
     last_vote = firebase.firestore.Timestamp.now().toDate()
+    red_history.push(last_vote)
+    firebase.firestore().collection('colors').doc('red').update({vote_time: red_history})
     vote_history.push(last_vote + ' -> Red')
     document.getElementById('last_vote').innerHTML = last_vote + ' -> Red'
 })
 document.getElementById('btn2').addEventListener('click', () => {
     firebase.firestore().collection('colors').doc('blue').set({count: blue + 1})
     last_vote = firebase.firestore.Timestamp.now().toDate()
+    blue_history.push(last_vote)
+    firebase.firestore().collection('colors').doc('blue').update({vote_time: blue_history})
     vote_history.push(last_vote + ' -> Blue')
     document.getElementById('last_vote').innerHTML = last_vote + ' -> Blue'
 })
 document.getElementById('btn3').addEventListener('click', () => {
     firebase.firestore().collection('colors').doc('yellow').set({count: yellow + 1})
     last_vote = firebase.firestore.Timestamp.now().toDate()
+    yellow_history.push(last_vote)
+    firebase.firestore().collection('colors').doc('yellow').update({vote_time: yellow_history})
     vote_history.push(last_vote + ' -> Yellow')
     document.getElementById('last_vote').innerHTML = last_vote + ' -> Yellow'
 })
@@ -102,9 +111,12 @@ document.getElementById('clear').addEventListener('click', () => {
     firebase.firestore().collection('colors').doc('red').set({count: 0})
     firebase.firestore().collection('colors').doc('blue').set({count: 0})
     firebase.firestore().collection('colors').doc('yellow').set({count: 0})
+    firebase.firestore().collection('colors').doc('red').update({vote_time: firebase.firestore.FieldValue.delete()})
+    firebase.firestore().collection('colors').doc('blue').update({vote_time: firebase.firestore.FieldValue.delete()})
+    firebase.firestore().collection('colors').doc('yellow').update({vote_time: firebase.firestore.FieldValue.delete()})
     last_vote = firebase.firestore.Timestamp.now().toDate()
     vote_history.push(last_vote + ' -> Clear votes')
-    document.getElementById('last_vote').innerHTML = last_vote + ' -> Clear votes'
+    document.getElementById('last_vote').innerHTML = 'Vote ends'
     console.log(vote_history)
-    vote_history = [ ]
+    vote_history = []
 })
